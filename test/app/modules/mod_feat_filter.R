@@ -605,12 +605,13 @@ mod_feat_fil_server <- function(id, data) {
         paste0("sia_feature_filter_data_", format(Sys.Date(), "%Y%m%d"), ".xlsx")
       },
       content = function(file) {
-        # Get selected device IDs from the filtered data
+
+        # Selected device IDs from the filter
         selected_ids <- filtered_data()$device_id
 
-        # Export full OSF data for those devices
+        # Main OSF export table
         export_df <- df_sia_osf %>%
-          filter(device_id %in% selected_ids) %>%
+          dplyr::filter(device_id %in% selected_ids) %>%
           as.data.frame()
 
         # Format release year if present
@@ -618,13 +619,45 @@ mod_feat_fil_server <- function(id, data) {
           export_df$release_year <- format(export_df$release_year, "%Y")
         }
 
-        # Write Excel with all tabs
-        write_xlsx(
+        # ------------------------------------------------
+        # Build RVU detailed tabs for the selected devices
+        # ------------------------------------------------
+        rvu_tabs <- df_shiny_rvu_detailed %>%
+          dplyr::filter(device_id %in% selected_ids)
+
+        if (nrow(rvu_tabs) > 0) {
+
+          rvu_tabs <- rvu_tabs %>%
+            split(.$device_id)
+
+          # Excel sheet names max 31 characters
+          names(rvu_tabs) <- substr(names(rvu_tabs), 1, 31)
+
+          # Optional: order studies by year
+          rvu_tabs <- purrr::map(
+            rvu_tabs,
+            ~ dplyr::arrange(.x, year)
+          )
+
+        } else {
+          rvu_tabs <- list()
+        }
+
+        # ------------------------------------------------
+        # Combine all sheets
+        # ------------------------------------------------
+        excel_sheets <- c(
           list(
             "Selected Devices" = export_df,
-            "Glossary"         = df_codebook,
-            "LICENSE"        = df_license
+            "Glossary" = df_codebook,
+            "LICENSE"  = df_license
           ),
+          rvu_tabs
+        )
+
+        # Write Excel file
+        writexl::write_xlsx(
+          excel_sheets,
           path = file
         )
       },

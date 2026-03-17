@@ -23,7 +23,7 @@ mod_article_ui <- function(id) {
           fluidRow(
             column(
               width = 3,
-              bs4Dash::bs4Card(
+              bs4Card(
                 title = "Why Needed?",
                 status = "primary",
                 solidHeader = FALSE,
@@ -93,7 +93,6 @@ mod_article_ui <- function(id) {
                     style = "color: #1c75bc;"
                   ),
 
-                  # ---- SHORT-TERM ----
                   strong("Short-term importance of criteria", style = "color:#000000;"), br(),
                   reactable::reactable(
                     data.frame(
@@ -163,7 +162,6 @@ mod_article_ui <- function(id) {
 
                   br(),
 
-                  # ---- LONG-TERM ----
                   strong("Long-term importance of criteria", style = "color:#000000;"), br(),
                   reactable(
                     data.frame(

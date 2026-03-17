@@ -159,23 +159,21 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
         updateSelectInput(session, "product3", selected = "")
         updateSelectInput(session, "model3", choices = character(0), selected = "")
       } else {
-        # 1) force-drop any old model2 value by using a dummy choice
+
         updateSelectInput(
           session, "model2",
           choices  = c("Resetting…" = dummy_model2),
           selected = dummy_model2
         )
 
-        # 2) now set real choices with empty selection
         enable("model2")
         m2_choices <- sort(unique(df$model[df$manufacturer == input$product2]))
         updateSelectInput(
           session, "model2",
           choices  = c("Choose a model" = "", m2_choices),
-          selected = ""   # user must choose manually
+          selected = ""
         )
 
-        # ensure product3 is reset/disabled
         disable("product3")
         disable("model3")
         updateSelectInput(session, "product3", selected = "")
@@ -185,11 +183,11 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
 
     # ---------------- MODEL 2 ----------------
     observeEvent(input$model2, {
-      # ignore the internal dummy value used during reset
+
       if (identical(input$model2, dummy_model2)) return()
 
       if (!is.null(input$model2) && nzchar(input$model2)) {
-        # now user really chose a model -> unlock product3
+
         enable("product3")
       } else {
         disable("product3")
@@ -206,7 +204,7 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
         disable("model3")
         updateSelectInput(session, "model3", choices = character(0), selected = "")
       } else {
-        # same dummy trick for model3 to avoid sticky values if you ever change product3
+
         updateSelectInput(
           session, "model3",
           choices  = c("Resetting…" = dummy_model3),
@@ -225,14 +223,12 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
 
     # ---------------- MODEL 3 ----------------
     observeEvent(input$model3, {
-      # ignore dummy internal reset value
+
       if (identical(input$model3, dummy_model3)) return()
 
       if (!is.null(input$model3) && nzchar(input$model3)) {
-        # nothing extra to unlock here, but you could add logic later
         invisible(NULL)
       } else {
-        # model3 cleared
         invisible(NULL)
       }
     })
@@ -244,20 +240,20 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
 
       if (!is.null(input$model1) && nzchar(input$model1))
         rows[[length(rows) + 1]] <- df %>%
-        dplyr::filter(manufacturer == input$product1, model == input$model1)
+        filter(manufacturer == input$product1, model == input$model1)
 
       if (!is.null(input$product2) && nzchar(input$product2) &&
           !is.null(input$model2) && nzchar(input$model2))
         rows[[length(rows) + 1]] <- df %>%
-        dplyr::filter(manufacturer == input$product2, model == input$model2)
+        filter(manufacturer == input$product2, model == input$model2)
 
       if (!is.null(input$product3) && nzchar(input$product3) &&
           !is.null(input$model3) && nzchar(input$model3))
         rows[[length(rows) + 1]] <- df %>%
-        dplyr::filter(manufacturer == input$product3, model == input$model3)
+        filter(manufacturer == input$product3, model == input$model3)
 
       if (length(rows) == 0) return(df[0, , drop = FALSE])
-      dplyr::bind_rows(rows) %>% dplyr::distinct(manufacturer, model, .keep_all = TRUE)
+      bind_rows(rows) %>% distinct(manufacturer, model, .keep_all = TRUE)
     })
 
     # ---------------- RENDER TABLE ----------------
@@ -275,7 +271,7 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
       df$release_year <- format(df$release_year, "%Y")
 
       df_t <- df %>%
-        dplyr::select(-manufacturer, -model, -device_id) %>%
+        select(-manufacturer, -model, -device_id) %>%
         t() %>%
         as.data.frame(stringsAsFactors = FALSE)
       colnames(df_t) <- paste0(df$manufacturer, " – ", df$model)
@@ -340,12 +336,10 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
 
     # ---------------- RESET ----------------
     observeEvent(input$reset_prod_filter, {
-      # Reset Product 2 + Model 2
       updateSelectInput(session, "product2", selected = "")
       updateSelectInput(session, "model2", choices = character(0), selected = "")
       disable("model2")
 
-      # Reset Product 3 + Model 3
       updateSelectInput(session, "product3", selected = "")
       updateSelectInput(session, "model3", choices = character(0), selected = "")
       disable("product3")
@@ -357,21 +351,44 @@ mod_prod_fil_server <- function(id, df_sia_shiny_filters) {
       filename = function() {
         paste0("sia_product_filter_data_", format(Sys.Date(), "%Y%m%d"), ".xlsx")
       },
+
       content = function(file) {
+
         selected_ids <- selected_products()$device_id
+
         export_df <- df_sia_osf %>%
-          dplyr::filter(device_id %in% selected_ids) %>%
+          filter(device_id %in% selected_ids) %>%
           as.data.frame()
 
-        write_xlsx(
+        rvu_tabs <- df_shiny_rvu_detailed %>%
+          filter(device_id %in% selected_ids)
+
+        if (nrow(rvu_tabs) > 0) {
+
+          rvu_tabs <- rvu_tabs %>%
+            split(.$device_id)
+
+          names(rvu_tabs) <- substr(names(rvu_tabs), 1, 31)
+
+        } else {
+          rvu_tabs <- list()
+        }
+
+        excel_sheets <- c(
           list(
             "Selected Devices" = export_df,
-            "Glossary"         = df_codebook,
-            "LICENSE"        = df_license
+            "Glossary" = df_codebook,
+            "LICENSE"  = df_license
           ),
+          rvu_tabs
+        )
+
+        write_xlsx(
+          excel_sheets,
           path = file
         )
       },
+
       contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
   })

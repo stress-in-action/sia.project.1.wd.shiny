@@ -33,7 +33,6 @@ mod_contact_ui <- function(id) {
                        textInput(ns("institution"), "Institution"),
                        textAreaInput(ns("message"), labelMandatory("Message"), ""),
 
-                       # Submit button (starts disabled)
                        actionButton(ns("submit_email"), "Submit", disabled = TRUE)
                      )
              )
@@ -63,10 +62,8 @@ mod_contact_server <- function(id) {
 
       })
 
-    # Call `send_email()` when Submit button is clicked
     observeEvent(input$submit_email, {
 
-      # Create email body
       body <- paste("Name: ", input$name,
                     "\nEmail: ", input$email,
                     "\nTelephone: ", input$telephone,
@@ -77,10 +74,8 @@ mod_contact_server <- function(id) {
 
       send_email(body, subject)
 
-      # Trigger JS alert from server
       session$sendCustomMessage("emailSubmitted", "Thank you for your message! We will get back to you soon.")
 
-      # Reset all fields in one go
       reset_inputs_contact(session)
     })
   })

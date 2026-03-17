@@ -15,7 +15,7 @@
 required_packages <- c(
   "shiny", "bs4Dash", "dplyr", "rlang", "scales", "fresh", "lubridate",
   "shinySearchbar", "emayili", "shinyjs", "sever", "shinycssloaders", "shinyWidgets",
-  "reactablefmtr", "reactable", "htmltools", "htmlwidgets", "writexl"
+  "reactablefmtr", "reactable", "htmltools", "htmlwidgets", "writexl", "purrr"
 )
 
 # Load each package
@@ -57,6 +57,7 @@ source("modules/mod_timeout.R")
 #  * 5 load data -----------------------------------------------
 df_sia_shiny_filters <- readRDS("data/df_shiny_sia_wd_filter.rds")
 df_sia_shiny_info    <- readRDS("data/df_shiny_sia_wd_info.rds")
+df_shiny_rvu_detailed <- readRDS("data/df_shiny_rvu_detailed.rds")
 df_sia_osf           <- readRDS("data/df_osf_sia_wd_shiny.rds")
 
 glos        <- readRDS("www/glos.rds")

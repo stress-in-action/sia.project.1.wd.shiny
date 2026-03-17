@@ -605,26 +605,47 @@ mod_feat_fil_server <- function(id, data) {
         paste0("sia_feature_filter_data_", format(Sys.Date(), "%Y%m%d"), ".xlsx")
       },
       content = function(file) {
-        # Get selected device IDs from the filtered data
+
         selected_ids <- filtered_data()$device_id
 
-        # Export full OSF data for those devices
         export_df <- df_sia_osf %>%
           filter(device_id %in% selected_ids) %>%
           as.data.frame()
 
-        # Format release year if present
         if ("release_year" %in% names(export_df)) {
           export_df$release_year <- format(export_df$release_year, "%Y")
         }
 
-        # Write Excel with all tabs
-        write_xlsx(
+        rvu_tabs <- df_shiny_rvu_detailed %>%
+          filter(device_id %in% selected_ids)
+
+        if (nrow(rvu_tabs) > 0) {
+
+          rvu_tabs <- rvu_tabs %>%
+            split(.$device_id)
+
+          names(rvu_tabs) <- substr(names(rvu_tabs), 1, 31)
+
+          rvu_tabs <- map(
+            rvu_tabs,
+            ~ arrange(.x, year)
+          )
+
+        } else {
+          rvu_tabs <- list()
+        }
+
+        excel_sheets <- c(
           list(
             "Selected Devices" = export_df,
-            "Glossary"         = df_codebook,
-            "LICENSE"        = df_license
+            "Glossary" = df_codebook,
+            "LICENSE"  = df_license
           ),
+          rvu_tabs
+        )
+
+        write_xlsx(
+          excel_sheets,
           path = file
         )
       },
@@ -640,33 +661,27 @@ mod_feat_fil_server <- function(id, data) {
       content = function(file) {
         settings <- list()
 
-        # Sliders: store "min;max"
         for (var in range_vars) {
           range_vals <- as.integer(round(input[[var]]))
           settings[[var]] <- paste(range_vals[1], range_vals[2], sep = ";")
         }
 
-        # Checkboxes: "YES" if selected, "YES;NO" if not (no restriction)
         for (var in checkbox_vars) {
           settings[[var]] <- if (isTRUE(input[[var]])) "yes" else "yes;no"
         }
 
-        # SelectInputs: chosen values separated by ";"
         for (var in select_inputs) {
           settings[[var]] <- paste(input[[var]], collapse = ";")
         }
 
-        # Release year range (YYYY;YYYY)
         settings[["release_year"]] <- paste(
           format(input$release_year[1], "%Y"),
           format(input$release_year[2], "%Y"),
           sep = ";"
         )
 
-        # Exclude NA SiA (same YES / YES;NO logic)
         settings[["exclude_na_sia"]] <- if (isTRUE(input$exclude_na_sia)) "yes" else "yes;no"
 
-        # Convert list → one-row data.frame
         df_settings <- data.frame(t(unlist(settings)), check.names = FALSE)
         names(df_settings) <- names(settings)
 

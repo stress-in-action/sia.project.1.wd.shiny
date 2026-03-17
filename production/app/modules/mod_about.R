@@ -225,7 +225,7 @@ mod_about_ui <- function(id) {
                  headerBorder = FALSE,
                  p("The goal of RT2 is to develop increasingly sophisticated versions of a cutting-edge, low-burden, ecologically valid ambulatory assessment toolkit to quantify stress in daily life, and to design, test, and iteratively improve stress interventions using that toolkit."), style = "text-align: justify;",
                  p("Current team members:"),
-                 # Myrte
+
                    p(
                      a(
                        href = "https://stress-in-action.nl/myrte-schoenmakers/",
@@ -248,7 +248,6 @@ mod_about_ui <- function(id) {
                      "Myrte Schoenmakers, PhD student VU Amsterdam"
                    ),
 
-                   # Melisa
                    p(
                      a(
                        href = "https://stress-in-action.nl/melisa-saygin/",
@@ -271,7 +270,6 @@ mod_about_ui <- function(id) {
                      "Melisa Saygin, PhD student VU Amsterdam"
                    ),
 
-                   # Magdalena
                    p(
                      a(
                        href = "https://stress-in-action.nl/magdalena-sikora/",
@@ -294,7 +292,6 @@ mod_about_ui <- function(id) {
                      "Magdalena Sikora, PhD student University of Twente"
                    ),
 
-                 # Flavia
                  p(
                    a(
                      href = "https://stress-in-action.nl/",
@@ -317,7 +314,6 @@ mod_about_ui <- function(id) {
                    "Flavia Ercoli, PhD student VU Amsterdam"
                  ),
 
-                   # Artemis
                    p(
                      a(
                        href = "https://stress-in-action.nl/artemis-stefani/",
@@ -340,7 +336,6 @@ mod_about_ui <- function(id) {
                      "Artemis Stefani, PhD - Post Doc VU Amsterdam"
                    ),
 
-                   # Matthijs
                    p(
                      a(
                        href = "https://stress-in-action.nl/matthijs-noordzij/",
@@ -363,7 +358,6 @@ mod_about_ui <- function(id) {
                      "Matthijs Noordzij, Professor in Health Psychology and Technology University of Twente"
                    ),
 
-                   # Eco
                    p(
                      a(
                        href = "https://stress-in-action.nl/eco-de-geus/",

@@ -58,6 +58,7 @@ source(here("test", "app", "modules", "mod_timeout.R"))
 #  * 5 load data -----------------------------------------------
 df_sia_shiny_filters <- readRDS(here("test", "app", "data", "df_shiny_sia_wd_filter.rds"))
 df_sia_shiny_info <- readRDS(here("test", "app", "data", "df_shiny_sia_wd_info.rds"))
+df_shiny_rvu_detailed <- readRDS(here("test", "app", "data", "df_shiny_rvu_detailed.rds"))
 df_sia_osf <- readRDS(here("test", "app", "data", "df_osf_sia_wd_shiny.rds"))
 
 glos <- readRDS(here("test", "app", "www","glos.rds"))
