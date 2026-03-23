@@ -86,10 +86,7 @@ mod_app_info_ui <- function(id) {
                 strong(paste(n_wearables, "Wearables included"), style = "color: #f15a29;"),
                 br(),
                 "see the ", icon("info-circle", style = "color:#1c75bc;"),
-                " button in the top right for an overview ",
-                br(), "of wearables and glossary.",
-                br(), br(),
-                strong("Updating in Dec/Jan to include 67+ wearables!")
+                " button in the top right for an overview"
               )
             )
           )
